@@ -1,3 +1,15 @@
+---
+
+title: Prediksi Kemiskinan Indonesia
+emoji: 🇮🇩
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+
+---
+
 # 🇮🇩 Prediksi Tingkat Kemiskinan di Indonesia
 **UTS Praktikum Kecerdasan Buatan**
 
@@ -100,7 +112,7 @@ python wsgi.py
 
 # Atau langsung dari folder app:
 cd app
-python app.py
+python app.py 
 ```
 
 Buka browser: **http://localhost:7860**
