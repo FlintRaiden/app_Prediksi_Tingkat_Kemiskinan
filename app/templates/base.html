@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Prediksi Kemiskinan Indonesia{% endblock %}</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ── Design Tokens ─────────────────────────────────────────────────────── */
+    :root {
+      --navy-900:  #0A192F;
+      --navy-800:  #0F2749;
+      --navy-700:  #1E3A8A;
+      --navy-600:  #1D4ED8;
+      --navy-500:  #3B82F6;
+      --accent:    #38BDF8;
+      --gold:      #F59E0B;
+      --gray-50:   #F8FAFC;
+      --gray-100:  #F1F5F9;
+      --gray-200:  #E2E8F0;
+      --gray-400:  #94A3B8;
+      --gray-600:  #475569;
+      --gray-800:  #1E293B;
+      --white:     #FFFFFF;
+      --success:   #10B981;
+      --warning:   #F59E0B;
+      --danger:    #EF4444;
+      --font:      'Inter', sans-serif;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 16px rgba(0,0,0,.10);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+    }
+
+    /* ── Global ───────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--gray-50);
+      color: var(--gray-800);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main { flex: 1; }
+
+    /* ── Navbar ───────────────────────────────────────────────────────────── */
+    .navbar-custom {
+      background: var(--navy-900);
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      padding: .85rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      backdrop-filter: blur(8px);
+    }
+    .navbar-brand-text {
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--white) !important;
+      letter-spacing: -.2px;
+    }
+    .navbar-brand-text span { color: var(--accent); }
+    .nav-link-custom {
+      color: rgba(255,255,255,.70) !important;
+      font-weight: 500;
+      font-size: .9rem;
+      padding: .45rem .9rem !important;
+      border-radius: var(--radius-md);
+      transition: all .2s;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .nav-link-custom:hover,
+    .nav-link-custom.active {
+      color: var(--white) !important;
+      background: rgba(255,255,255,.08);
+    }
+    .nav-link-custom.active { background: rgba(56,189,248,.15) !important; color: var(--accent) !important; }
+
+    /* ── Cards ────────────────────────────────────────────────────────────── */
+    .card-custom {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .card-custom:hover { box-shadow: var(--shadow-md); }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      padding: 1.4rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .stat-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .stat-value { font-size: 1.75rem; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: .8rem; font-weight: 500; color: var(--gray-400); text-transform: uppercase; letter-spacing: .5px; margin-top: .25rem; }
+
+    /* ── Section Headers ──────────────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+      margin-bottom: 1.25rem;
+    }
+    .section-header .icon-box {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(59,130,246,.12);
+      color: var(--navy-600);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .section-title { font-size: 1.05rem; font-weight: 700; margin: 0; color: var(--navy-900); }
+    .section-sub   { font-size: .8rem; color: var(--gray-400); margin: 0; }
+
+    /* ── Chart containers ─────────────────────────────────────────────────── */
+    .chart-wrap { position: relative; }
+
+    /* ── Loading overlay ──────────────────────────────────────────────────── */
+    .loading-overlay {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 320px;
+      gap: 1rem;
+    }
+    .spinner-ring {
+      width: 56px; height: 56px;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--navy-600);
+      border-radius: 50%;
+      animation: spin .9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Badges ───────────────────────────────────────────────────────────── */
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .3rem .75rem;
+      border-radius: 50px;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────────── */
+    .footer {
+      background: var(--navy-900);
+      color: rgba(255,255,255,.55);
+      padding: 2rem 0;
+      margin-top: auto;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ── Utilities ────────────────────────────────────────────────────────── */
+    .text-navy  { color: var(--navy-700) !important; }
+    .text-accent{ color: var(--accent)   !important; }
+    .bg-navy    { background: var(--navy-900) !important; }
+    .border-top-navy { border-top: 3px solid var(--navy-700); }
+
+    /* table tweaks */
+    .table-metrics thead th {
+      background: var(--navy-900);
+      color: var(--white);
+      font-size: .82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border: none;
+    }
+    .table-metrics tbody td { vertical-align: middle; font-size: .88rem; }
+    .table-metrics tbody tr:hover td { background: var(--gray-100); }
+
+    @media (max-width: 576px) {
+      .stat-value { font-size: 1.4rem; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ════ NAVBAR ════════════════════════════════════════════════════════════ -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+  <div class="container">
+    <a class="navbar-brand navbar-brand-text d-flex align-items-center gap-2" href="/">
+      <i class="bi bi-graph-up-arrow" style="color:var(--accent);font-size:1.3rem;"></i>
+      Kemiskinan<span>ID</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <i class="bi bi-list text-white fs-4"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav ms-auto gap-1">
+        <li class="nav-item">
+          <a class="nav-link-custom {% if request.endpoint=='index' %}active{% endif %}" href="/">
+            <i class="bi bi-house"></i> Beranda
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-custom {% if request.endpoint=='predict' %}active{% endif %}" href="/predict">
+            <i class="bi bi-lightning-charge"></i> Prediksi Real-Time
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-custom {% if request.endpoint=='comparison' %}active{% endif %}" href="/comparison">
+            <i class="bi bi-bar-chart-line"></i> Perbandingan Model
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ════ MAIN CONTENT ═══════════════════════════════════════════════════════ -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ════ FOOTER ════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="row align-items-center gy-3">
+      <div class="col-md-6">
+        <div class="fw-700 text-white mb-1" style="font-weight:700;">
+          <i class="bi bi-graph-up-arrow" style="color:var(--accent);"></i>
+          Prediksi Tingkat Kemiskinan di Indonesia
+        </div>
+        <small>UTS Praktikum Kecerdasan Buatan &mdash; Data: BPS / Kaggle (514 Kabupaten/Kota, 34 Provinsi)</small>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <small>
+          Dibangun dengan <span style="color:var(--accent);">Flask</span> &bull;
+          <span style="color:var(--accent);">Scikit-learn</span> &bull;
+          <span style="color:var(--accent);">TensorFlow/Keras</span> &bull;
+          <span style="color:var(--accent);">NumPy</span>
+        </small>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

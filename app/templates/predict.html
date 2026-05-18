@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% block title %}Prediksi Real-Time — Kemiskinan Indonesia{% endblock %}
+
+{% block content %}
+<div style="background:linear-gradient(135deg,#0A192F,#1E3A8A);padding:3rem 0 5rem;">
+  <div class="container">
+    <div class="badge-pill mb-3" style="background:rgba(56,189,248,.15);color:#38BDF8;border:1px solid rgba(56,189,248,.3);">
+      <i class="bi bi-lightning-charge-fill"></i> Prediksi Real-Time
+    </div>
+    <h2 style="color:#fff;font-weight:800;margin-bottom:.5rem;">Prediksi Tingkat Kemiskinan</h2>
+    <p style="color:rgba(255,255,255,.65);max-width:560px;">
+      Masukkan indikator sosial-ekonomi suatu wilayah untuk mendapatkan estimasi persentase kemiskinan
+      dari 5 model Machine Learning secara bersamaan.
+    </p>
+  </div>
+</div>
+
+<div class="container" style="margin-top:-3rem;padding-bottom:4rem;">
+
+  {% if not ready and not error %}
+  <!-- Model still training -->
+  <div class="card-custom p-5">
+    <div class="loading-overlay">
+      <div class="spinner-ring"></div>
+      <div class="text-center">
+        <p class="fw-600 mb-1" style="font-size:1.05rem;color:#1E3A8A;">Model sedang dilatih…</p>
+        <p class="text-muted small">Silakan tunggu beberapa saat, halaman akan dimuat ulang otomatis.</p>
+      </div>
+    </div>
+  </div>
+  <script>setTimeout(()=>location.reload(), 5000);</script>
+
+  {% else %}
+
+  {% if error %}
+  <div class="alert alert-danger border-0 rounded-3 mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Error:</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="row g-4">
+
+    <!-- ══ INPUT FORM ══════════════════════════════════════════════════════ -->
+    <div class="col-xl-5">
+      <div class="card-custom p-4 h-100">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-input-cursor-text"></i></div>
+          <div>
+            <div class="section-title">Input Indikator Sosial-Ekonomi</div>
+            <div class="section-sub">Isi seluruh 9 indikator di bawah ini</div>
+          </div>
+        </div>
+
+        <form method="POST" action="/predict" id="predForm">
+          {% for f in form_fields %}
+          <div class="mb-3">
+            <label class="form-label d-flex align-items-center gap-2 mb-1" style="font-size:.85rem;font-weight:600;color:#334155;">
+              <i class="bi {{ f.icon }}" style="color:#1E3A8A;"></i>
+              {{ f.label }}
+              {% if f.unit %}<span class="badge text-bg-secondary fw-normal ms-1" style="font-size:.7rem;">{{ f.unit }}</span>{% endif %}
+              <span class="ms-auto" data-bs-toggle="tooltip" title="{{ f.tip }}">
+                <i class="bi bi-info-circle text-muted" style="cursor:help;font-size:.85rem;"></i>
+              </span>
+            </label>
+            <input
+              type="number"
+              class="form-control form-control-sm"
+              id="{{ f.name }}"
+              name="{{ f.name }}"
+              min="{{ f.min }}"
+              max="{{ f.max }}"
+              step="{{ f.step }}"
+              placeholder="{{ f.placeholder }}"
+              value="{{ form_data.get(f.name, '') }}"
+              required
+              style="border-radius:8px;border:1px solid #CBD5E1;font-size:.88rem;"
+            />
+          </div>
+          {% endfor %}
+
+          <!-- Example fill button -->
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn flex-grow-1 fw-600"
+              style="background:#1E3A8A;color:#fff;border-radius:10px;font-weight:600;padding:.65rem;">
+              <i class="bi bi-cpu-fill me-2"></i>Jalankan Prediksi
+            </button>
+            <button type="button" class="btn" id="btnFillExample"
+              style="background:#F1F5F9;color:#475569;border:1px solid #E2E8F0;border-radius:10px;white-space:nowrap;font-size:.85rem;">
+              <i class="bi bi-magic me-1"></i>Contoh
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- ══ RESULTS PANEL ═══════════════════════════════════════════════════ -->
+    <div class="col-xl-7">
+
+      {% if result %}
+      <!-- ── Ensemble Verdict ── -->
+      <div class="card-custom p-4 mb-4"
+           style="border-top:4px solid
+             {% if result.level_color=='success' %}#10B981{% elif result.level_color=='warning' %}#F59E0B{% else %}#EF4444{% endif %};">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+          <div class="text-center" style="min-width:110px;">
+            <div style="font-size:3rem;font-weight:900;
+              color:{% if result.level_color=='success' %}#10B981{% elif result.level_color=='warning' %}#D97706{% else %}#EF4444{% endif %};">
+              {{ result.ensemble }}%
+            </div>
+            <div style="font-size:.8rem;color:#64748b;font-weight:600;">ENSEMBLE AVERAGE</div>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge fs-6 px-3 py-2
+                {% if result.level_color=='success' %}bg-success{% elif result.level_color=='warning' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                <i class="bi bi-{% if result.level_color=='success' %}check-circle{% elif result.level_color=='warning' %}dash-circle{% else %}x-circle{% endif %}-fill me-1"></i>
+                Kemiskinan {{ result.level }}
+              </span>
+              <span class="badge px-3 py-2" style="background:rgba(30,58,138,.12);color:#1E3A8A;">
+                <i class="bi bi-pentagon-fill me-1"></i>
+                Klaster: {{ result.cluster_name }}
+              </span>
+            </div>
+            <p class="text-muted mb-0" style="font-size:.85rem;">
+              Prediksi ensemble rata-rata dari 4 model regresi.
+              Pengelompokan K-Means menunjukkan bahwa wilayah ini termasuk dalam kategori
+              <strong>{{ result.cluster_name }}</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Per-model predictions ── -->
+      <div class="card-custom p-4 mb-4">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-grid-3x2-gap"></i></div>
+          <div>
+            <div class="section-title">Prediksi per Model</div>
+            <div class="section-sub">Hasil prediksi individual dari masing-masing algoritma</div>
+          </div>
+        </div>
+        <div class="row g-3 mb-4">
+          {% for label, key, color, icon in [
+            ("Linear Regression", "linear",  "#1E3A8A", "bi-diagram-2"),
+            ("ANN (Keras)",       "ann",     "#7C3AED", "bi-layers"),
+            ("LSTM / RNN",        "lstm",    "#0891B2", "bi-arrow-repeat"),
+            ("Backpropagation",   "backprop","#D97706", "bi-gear-wide-connected"),
+          ] %}
+          <div class="col-6">
+            <div class="rounded-3 p-3" style="background:{{ color }}10;border:1px solid {{ color }}25;">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <i class="bi {{ icon }}" style="color:{{ color }};font-size:1rem;"></i>
+                <span style="font-size:.78rem;font-weight:600;color:#475569;">{{ label }}</span>
+              </div>
+              <div style="font-size:1.6rem;font-weight:800;color:{{ color }};">
+                {{ result[key] }}%
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Comparison bar chart -->
+        <div class="chart-wrap" style="height:150px;">
+          <canvas id="chartPred"></canvas>
+        </div>
+      </div>
+
+      <!-- ── Input Summary ── -->
+      <div class="card-custom p-4">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-list-check"></i></div>
+          <div><div class="section-title">Ringkasan Input</div></div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm mb-0" style="font-size:.83rem;">
+            <thead><tr style="background:#F8FAFC;">
+              <th class="fw-600 text-muted" style="font-size:.75rem;text-transform:uppercase;">Indikator</th>
+              <th class="fw-600 text-muted text-end" style="font-size:.75rem;text-transform:uppercase;">Nilai</th>
+            </tr></thead>
+            <tbody>
+              {% for i, f in enumerate(form_fields) %}
+              <tr>
+                <td>{{ f.label }}</td>
+                <td class="text-end fw-600">{{ result.input_values[i] }} {{ f.unit }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {% else %}
+      <!-- No result yet -->
+      <div class="card-custom p-5 h-100 d-flex align-items-center justify-content-center">
+        <div class="text-center">
+          <i class="bi bi-cpu" style="font-size:3.5rem;color:#CBD5E1;"></i>
+          <p class="fw-600 mt-3 mb-1" style="color:#94A3B8;">Hasil Prediksi Akan Muncul di Sini</p>
+          <p class="text-muted small">Isi form di sebelah kiri dan klik <em>Jalankan Prediksi</em>.</p>
+          <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
+            {% for name, color, icon in [
+              ("Linear Regression","#1E3A8A","bi-diagram-2"),
+              ("ANN","#7C3AED","bi-layers"),
+              ("LSTM","#0891B2","bi-arrow-repeat"),
+              ("K-Means","#059669","bi-pentagon"),
+              ("Backprop","#D97706","bi-gear-wide-connected"),
+            ] %}
+            <span class="badge px-3 py-2 d-flex align-items-center gap-1"
+                  style="background:{{ color }}15;color:{{ color }};border:1px solid {{ color }}30;font-size:.75rem;">
+              <i class="bi {{ icon }}"></i> {{ name }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+    </div><!-- /col -->
+  </div><!-- /row -->
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Tooltip init -->
+<script>
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el, { placement: 'top' });
+  });
+
+  /* Example filler */
+  const EXAMPLES = {
+    lama_sekolah: 9.50,
+    pengeluaran:  8500,
+    ipm:          70.50,
+    harapan_hidup:68.00,
+    sanitasi:     75.00,
+    air_minum:    80.00,
+    pengangguran:  5.50,
+    tpak:         65.00,
+    pdrb:         5000000,
+  };
+  document.getElementById('btnFillExample')?.addEventListener('click', () => {
+    Object.entries(EXAMPLES).forEach(([k, v]) => {
+      const el = document.getElementById(k);
+      if (el) el.value = v;
+    });
+  });
+
+  /* Loading state on submit */
+  document.getElementById('predForm')?.addEventListener('submit', function () {
+    const btn = this.querySelector('[type="submit"]');
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses…';
+    btn.disabled = true;
+  });
+</script>
+
+{% if result %}
+<script>
+Chart.defaults.font.family = "'Inter', sans-serif";
+
+const predLabels = {{ result.pred_labels|safe }};
+const predValues = {{ result.pred_values|safe }};
+const palette = ['#1E3A8A','#7C3AED','#0891B2','#D97706'];
+
+new Chart(document.getElementById('chartPred'), {
+  type: 'bar',
+  data: {
+    labels: predLabels,
+    datasets: [{
+      label: '% Kemiskinan',
+      data:  predValues,
+      backgroundColor: palette.map(c => c + 'CC'),
+      borderRadius: 5, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `${ctx.raw}%` } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: {
+        grid: { color: 'rgba(100,116,139,.12)' },
+        title: { display: true, text: '% Kemiskinan' },
+        suggestedMin: 0,
+      }
+    }
+  }
+});
+</script>
+{% endif %}
+{% endblock %}

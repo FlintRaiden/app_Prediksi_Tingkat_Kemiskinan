@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+{% block title %}Perbandingan Model — Kemiskinan Indonesia{% endblock %}
+
+{% block content %}
+<div style="background:linear-gradient(135deg,#0A192F,#1E3A8A);padding:3rem 0 5rem;">
+  <div class="container">
+    <div class="badge-pill mb-3" style="background:rgba(56,189,248,.15);color:#38BDF8;border:1px solid rgba(56,189,248,.3);">
+      <i class="bi bi-bar-chart-line-fill"></i> Model Comparison Dashboard
+    </div>
+    <h2 style="color:#fff;font-weight:800;margin-bottom:.5rem;">Perbandingan Performa Model</h2>
+    <p style="color:rgba(255,255,255,.65);max-width:560px;">
+      Evaluasi komprehensif 5 algoritma Machine Learning menggunakan metrik standar UTS
+      Praktikum Kecerdasan Buatan.
+    </p>
+  </div>
+</div>
+
+<div class="container" style="margin-top:-3rem;padding-bottom:4rem;">
+
+  {% if not ready and not error %}
+  <div class="card-custom p-5">
+    <div class="loading-overlay">
+      <div class="spinner-ring"></div>
+      <div class="text-center">
+        <p class="fw-600 mb-1" style="font-size:1.05rem;color:#1E3A8A;">Model sedang dilatih…</p>
+        <p class="text-muted small">Halaman ini akan diperbarui otomatis saat semua model selesai.</p>
+      </div>
+    </div>
+  </div>
+  <script>setTimeout(()=>location.reload(), 5000);</script>
+
+  {% elif error %}
+  <div class="alert alert-danger border-0 rounded-3">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Error:</strong> {{ error }}
+  </div>
+
+  {% else %}
+
+  <!-- ════ SUMMARY CARDS ════════════════════════════════════════════════════ -->
+  <div class="row g-3 mb-4">
+
+    <!-- Linear Regression -->
+    <div class="col-sm-6 col-xl">
+      <div class="stat-card" style="border-top:3px solid #1E3A8A;">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="stat-icon" style="background:#1E3A8A18;color:#1E3A8A;width:38px;height:38px;font-size:.95rem;">
+            <i class="bi bi-diagram-2"></i>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:#1E3A8A;text-transform:uppercase;letter-spacing:.4px;">Linear Regression</div>
+        </div>
+        {% if metrics.linear %}
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">MAE</span>
+            <span class="small fw-700">{{ metrics.linear.mae }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">RMSE</span>
+            <span class="small fw-700">{{ metrics.linear.rmse }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">R² Score</span>
+            <span class="small fw-700 text-success">{{ metrics.linear.r2 }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ANN -->
+    <div class="col-sm-6 col-xl">
+      <div class="stat-card" style="border-top:3px solid #7C3AED;">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="stat-icon" style="background:#7C3AED18;color:#7C3AED;width:38px;height:38px;font-size:.95rem;">
+            <i class="bi bi-layers"></i>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:#7C3AED;text-transform:uppercase;letter-spacing:.4px;">ANN / Keras</div>
+        </div>
+        {% if metrics.ann %}
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">MAE</span>
+            <span class="small fw-700">{{ metrics.ann.mae }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">RMSE</span>
+            <span class="small fw-700">{{ metrics.ann.rmse }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">R² Score</span>
+            <span class="small fw-700 text-success">{{ metrics.ann.r2 }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- LSTM -->
+    <div class="col-sm-6 col-xl">
+      <div class="stat-card" style="border-top:3px solid #0891B2;">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="stat-icon" style="background:#0891B218;color:#0891B2;width:38px;height:38px;font-size:.95rem;">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.4px;">LSTM / RNN</div>
+        </div>
+        {% if metrics.lstm %}
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">MAE</span>
+            <span class="small fw-700">{{ metrics.lstm.mae }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">RMSE</span>
+            <span class="small fw-700">{{ metrics.lstm.rmse }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">MAPE</span>
+            <span class="small fw-700">{{ metrics.lstm.mape }}%</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- K-Means -->
+    <div class="col-sm-6 col-xl">
+      <div class="stat-card" style="border-top:3px solid #059669;">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="stat-icon" style="background:#05966918;color:#059669;width:38px;height:38px;font-size:.95rem;">
+            <i class="bi bi-pentagon"></i>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:.4px;">K-Means</div>
+        </div>
+        {% if metrics.kmeans %}
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">Inertia</span>
+            <span class="small fw-700">{{ "{:,.0f}".format(metrics.kmeans.inertia) }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">Silhouette</span>
+            <span class="small fw-700 text-success">{{ metrics.kmeans.silhouette }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">K Klaster</span>
+            <span class="small fw-700">{{ metrics.kmeans.n_clusters }}</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Backprop -->
+    <div class="col-sm-6 col-xl">
+      <div class="stat-card" style="border-top:3px solid #D97706;">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="stat-icon" style="background:#D9770618;color:#D97706;width:38px;height:38px;font-size:.95rem;">
+            <i class="bi bi-gear-wide-connected"></i>
+          </div>
+          <div style="font-size:.78rem;font-weight:700;color:#D97706;text-transform:uppercase;letter-spacing:.4px;">Backpropagation</div>
+        </div>
+        {% if metrics.backprop %}
+        <div class="d-flex flex-column gap-1">
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">Final Loss</span>
+            <span class="small fw-700">{{ metrics.backprop.final_loss }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">MAE</span>
+            <span class="small fw-700">{{ metrics.backprop.mae }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span class="small text-muted">Convergence</span>
+            <span class="small fw-700 text-success">{{ metrics.backprop.convergence_rate }}%</span>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div><!-- /summary cards -->
+
+  <!-- ════ CHARTS ROW ════════════════════════════════════════════════════ -->
+  <div class="row g-4 mb-4">
+
+    <!-- MAE / RMSE Comparison Bar Chart -->
+    <div class="col-lg-7">
+      <div class="card-custom p-4 h-100">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-bar-chart-steps"></i></div>
+          <div>
+            <div class="section-title">Perbandingan MAE & RMSE</div>
+            <div class="section-sub">Semakin rendah = semakin baik. Test set (20%)</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="chartCompare"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backpropagation Convergence -->
+    <div class="col-lg-5">
+      <div class="card-custom p-4 h-100">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-activity"></i></div>
+          <div>
+            <div class="section-title">Kurva Konvergensi Backprop</div>
+            <div class="section-sub">MSE Loss selama pelatihan ({{ metrics.backprop.convergence_rate|round(1) }}% penurunan)</div>
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:260px;">
+          <canvas id="chartConv"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- K-Means Cluster Breakdown -->
+  {% if metrics.kmeans and metrics.kmeans.cluster_avgs %}
+  <div class="row g-4 mb-4">
+    <div class="col-12">
+      <div class="card-custom p-4">
+        <div class="section-header mb-3">
+          <div class="icon-box"><i class="bi bi-pentagon-fill"></i></div>
+          <div>
+            <div class="section-title">K-Means — Profil Klaster</div>
+            <div class="section-sub">Rata-rata % kemiskinan per klaster dari seluruh data</div>
+          </div>
+        </div>
+        <div class="row g-3">
+          {% for name, avg in metrics.kmeans.cluster_avgs.items() %}
+          {% set color = "#10B981" if "Rendah" in name else ("#F59E0B" if "Sedang" in name else "#EF4444") %}
+          {% set bg    = "#10B98112" if "Rendah" in name else ("#F59E0B12" if "Sedang" in name else "#EF444412") %}
+          <div class="col-md-4">
+            <div class="rounded-3 p-4 text-center" style="background:{{ bg }};border:1px solid {{ color }}30;">
+              <div style="font-size:2rem;font-weight:800;color:{{ color }};">{{ avg }}%</div>
+              <div class="fw-600 mt-1" style="color:#334155;">{{ name }}</div>
+              <div class="text-muted small mt-1">Rata-rata Tingkat Kemiskinan</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ════ FULL METRICS TABLE ════════════════════════════════════════════ -->
+  <div class="card-custom p-4">
+    <div class="section-header mb-3">
+      <div class="icon-box"><i class="bi bi-table"></i></div>
+      <div>
+        <div class="section-title">Tabel Metrik Lengkap</div>
+        <div class="section-sub">Sesuai ketentuan UTS Praktikum Kecerdasan Buatan</div>
+      </div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-metrics table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Jenis</th>
+            <th class="text-center">MAE</th>
+            <th class="text-center">RMSE</th>
+            <th class="text-center">R² / Metrik Utama</th>
+            <th class="text-center">Metrik Tambahan</th>
+            <th class="text-center">Backend</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Linear Regression -->
+          {% if metrics.linear %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-diagram-2" style="color:#1E3A8A;font-size:1.1rem;"></i>
+                <span class="fw-600">Linear Regression</span>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#1E3A8A15;color:#1E3A8A;">Supervised Regression</span></td>
+            <td class="text-center fw-600">{{ metrics.linear.mae }}</td>
+            <td class="text-center fw-600">{{ metrics.linear.rmse }}</td>
+            <td class="text-center">
+              <span class="badge {% if metrics.linear.r2 > 0.7 %}bg-success{% elif metrics.linear.r2 > 0.5 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                R² = {{ metrics.linear.r2 }}
+              </span>
+            </td>
+            <td class="text-center text-muted small">—</td>
+            <td class="text-center"><span class="badge text-bg-secondary fw-normal">Scikit-learn</span></td>
+          </tr>
+          {% endif %}
+
+          <!-- ANN -->
+          {% if metrics.ann %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-layers" style="color:#7C3AED;font-size:1.1rem;"></i>
+                <span class="fw-600">Artificial Neural Network</span>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#7C3AED15;color:#7C3AED;">Supervised Regression</span></td>
+            <td class="text-center fw-600">{{ metrics.ann.mae }}</td>
+            <td class="text-center fw-600">{{ metrics.ann.rmse }}</td>
+            <td class="text-center">
+              <span class="badge {% if metrics.ann.r2 > 0.7 %}bg-success{% elif metrics.ann.r2 > 0.5 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                R² = {{ metrics.ann.r2 }}
+              </span>
+            </td>
+            <td class="text-center text-muted small">Dense: 128-64-32-1</td>
+            <td class="text-center"><span class="badge text-bg-secondary fw-normal">{{ metrics.ann.backend }}</span></td>
+          </tr>
+          {% endif %}
+
+          <!-- LSTM -->
+          {% if metrics.lstm %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-repeat" style="color:#0891B2;font-size:1.1rem;"></i>
+                <span class="fw-600">LSTM / RNN</span>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#0891B215;color:#0891B2;">Sequential Regression</span></td>
+            <td class="text-center fw-600">{{ metrics.lstm.mae }}</td>
+            <td class="text-center fw-600">{{ metrics.lstm.rmse }}</td>
+            <td class="text-center">
+              <span class="badge bg-info text-dark">MAPE = {{ metrics.lstm.mape }}%</span>
+            </td>
+            <td class="text-center text-muted small">LSTM(64)-LSTM(32)-Dense(1)</td>
+            <td class="text-center"><span class="badge text-bg-secondary fw-normal">{{ metrics.lstm.backend }}</span></td>
+          </tr>
+          {% endif %}
+
+          <!-- K-Means -->
+          {% if metrics.kmeans %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-pentagon" style="color:#059669;font-size:1.1rem;"></i>
+                <span class="fw-600">K-Means Clustering</span>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#05966915;color:#059669;">Unsupervised</span></td>
+            <td class="text-center text-muted">—</td>
+            <td class="text-center text-muted">—</td>
+            <td class="text-center">
+              <span class="badge bg-success">Silhouette = {{ metrics.kmeans.silhouette }}</span>
+            </td>
+            <td class="text-center text-muted small">Inertia: {{ "{:,.0f}".format(metrics.kmeans.inertia) }}</td>
+            <td class="text-center"><span class="badge text-bg-secondary fw-normal">Scikit-learn</span></td>
+          </tr>
+          {% endif %}
+
+          <!-- Backpropagation -->
+          {% if metrics.backprop %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-gear-wide-connected" style="color:#D97706;font-size:1.1rem;"></i>
+                <span class="fw-600">Backpropagation</span>
+              </div>
+            </td>
+            <td><span class="badge" style="background:#D9770615;color:#D97706;">Manual NumPy</span></td>
+            <td class="text-center fw-600">{{ metrics.backprop.mae }}</td>
+            <td class="text-center fw-600">{{ metrics.backprop.rmse }}</td>
+            <td class="text-center">
+              <span class="badge bg-warning text-dark">Loss = {{ metrics.backprop.final_loss }}</span>
+            </td>
+            <td class="text-center text-muted small">Conv. {{ metrics.backprop.convergence_rate }}%</td>
+            <td class="text-center"><span class="badge text-bg-secondary fw-normal">Pure NumPy</span></td>
+          </tr>
+          {% endif %}
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Metric legend -->
+    <div class="mt-3 pt-3 border-top d-flex flex-wrap gap-3">
+      <div class="small text-muted"><strong>MAE</strong> — Mean Absolute Error (↓ lebih baik)</div>
+      <div class="small text-muted"><strong>RMSE</strong> — Root Mean Squared Error (↓ lebih baik)</div>
+      <div class="small text-muted"><strong>R²</strong> — Koefisien Determinasi (↑ lebih baik, maks 1.0)</div>
+      <div class="small text-muted"><strong>MAPE</strong> — Mean Absolute Percentage Error (↓ lebih baik)</div>
+      <div class="small text-muted"><strong>Silhouette</strong> — Kualitas klaster (maks 1.0)</div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if ready %}
+<script>
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size   = 12;
+Chart.defaults.color       = '#64748b';
+
+const gridColor = 'rgba(100,116,139,.12)';
+
+/* ── MAE / RMSE Grouped Bar ── */
+const regLabels = {{ reg_labels|safe }};
+const regMAE    = {{ reg_mae|safe }};
+const regRMSE   = {{ reg_rmse|safe }};
+const palette   = ['#1E3A8A','#7C3AED','#0891B2','#D97706'];
+
+new Chart(document.getElementById('chartCompare'), {
+  type: 'bar',
+  data: {
+    labels: regLabels,
+    datasets: [
+      {
+        label: 'MAE',
+        data: regMAE,
+        backgroundColor: palette.map(c => c + 'CC'),
+        borderRadius: 5,
+        borderSkipped: false,
+      },
+      {
+        label: 'RMSE',
+        data: regRMSE,
+        backgroundColor: palette.map(c => c + '66'),
+        borderRadius: 5,
+        borderSkipped: false,
+        borderWidth: 1.5,
+        borderColor: palette,
+      },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: { usePointStyle: true, pointStyle: 'rect', padding: 16, font: { size: 11 } }
+      },
+      tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw}` } }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: {
+        grid: { color: gridColor },
+        title: { display: true, text: 'Error (% kemiskinan)' },
+        beginAtZero: true,
+      }
+    }
+  }
+});
+
+/* ── Backprop Convergence Line ── */
+const bpEpochs = {{ bp_epochs|safe }};
+const bpLosses = {{ bp_losses|safe }};
+
+new Chart(document.getElementById('chartConv'), {
+  type: 'line',
+  data: {
+    labels: bpEpochs,
+    datasets: [{
+      label: 'MSE Loss',
+      data:  bpLosses,
+      borderColor: '#D97706',
+      backgroundColor: 'rgba(217,119,6,.08)',
+      fill: true,
+      tension: 0.35,
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: {
+        title:  ctx => `Epoch ${ctx[0].label}`,
+        label:  ctx => `Loss: ${ctx.raw}`,
+      }}
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        title: { display: true, text: 'Epoch' },
+        ticks: { maxTicksLimit: 8 },
+      },
+      y: {
+        grid: { color: gridColor },
+        title: { display: true, text: 'MSE Loss' },
+        beginAtZero: false,
+      }
+    }
+  }
+});
+</script>
+{% endif %}
+{% endblock %}
