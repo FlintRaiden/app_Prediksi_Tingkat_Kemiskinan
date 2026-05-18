@@ -10,7 +10,7 @@ pinned: false
 
 ---
 
-# 🇮🇩 Prediksi Tingkat Kemiskinan di Indonesia
+# 🌏 Prediksi Tingkat Kemiskinan di Indonesia
 **UTS Praktikum Kecerdasan Buatan**
 
 > Platform prediksi berbasis Machine Learning untuk mengestimasi persentase penduduk miskin per Kabupaten/Kota di Indonesia menggunakan 5 algoritma terintegrasi.
