@@ -10,14 +10,14 @@ pinned: false
 
 ---
 
-# 🌏 Prediksi Tingkat Kemiskinan di Indonesia
+#  Prediksi Tingkat Kemiskinan di Indonesia
 **UTS Praktikum Kecerdasan Buatan**
 
 > Platform prediksi berbasis Machine Learning untuk mengestimasi persentase penduduk miskin per Kabupaten/Kota di Indonesia menggunakan 5 algoritma terintegrasi.
 
 ---
 
-## 📋 Deskripsi Proyek
+##  Deskripsi Proyek
 
 Aplikasi web Flask yang mengimplementasikan **5 algoritma Machine Learning** untuk memprediksi tingkat kemiskinan (% penduduk miskin) berdasarkan indikator sosial-ekonomi tingkat Kabupaten/Kota di Indonesia.
 
@@ -31,7 +31,7 @@ Aplikasi web Flask yang mengimplementasikan **5 algoritma Machine Learning** unt
 
 ---
 
-## 📊 Dataset
+##  Dataset
 
 - **Sumber**: Badan Pusat Statistik (BPS) Indonesia / Kaggle
 - **Cakupan**: 514 Kabupaten/Kota dari 34 Provinsi
@@ -54,7 +54,7 @@ Aplikasi web Flask yang mengimplementasikan **5 algoritma Machine Learning** unt
 
 ---
 
-## 🏗️ Struktur Proyek
+##  Struktur Proyek
 
 ```
 poverty-prediction/
@@ -80,7 +80,7 @@ poverty-prediction/
 
 ---
 
-## 🚀 Cara Menjalankan Lokal
+##  Cara Menjalankan Lokal
 
 ### 1. Clone / Download Proyek
 
@@ -119,7 +119,7 @@ Buka browser: **http://localhost:7860**
 
 ---
 
-## ☁️ Deployment ke Hugging Face Spaces
+##  Deployment ke Hugging Face Spaces
 
 ### Persiapan
 
@@ -164,7 +164,7 @@ CMD ["gunicorn", "--chdir", "app", "app:app", "--bind", "0.0.0.0:7860", \
 
 ---
 
-## 📈 Metrik Evaluasi
+##  Metrik Evaluasi
 
 | Model | Metrik Utama |
 |-------|-------------|
@@ -176,7 +176,7 @@ CMD ["gunicorn", "--chdir", "app", "app:app", "--bind", "0.0.0.0:7860", \
 
 ---
 
-## 🖥️ Halaman Aplikasi
+##  Halaman Aplikasi
 
 | Halaman | URL | Deskripsi |
 |---------|-----|-----------|
@@ -186,7 +186,7 @@ CMD ["gunicorn", "--chdir", "app", "app:app", "--bind", "0.0.0.0:7860", \
 
 ---
 
-## 🛠️ Teknologi
+##  Teknologi
 
 - **Backend**: Flask 3.0, Python 3.11
 - **Machine Learning**: Scikit-learn, TensorFlow/Keras, NumPy
@@ -195,7 +195,7 @@ CMD ["gunicorn", "--chdir", "app", "app:app", "--bind", "0.0.0.0:7860", \
 
 ---
 
-## 👨‍💻 Informasi UTS
+##  Informasi UTS
 
 - **Mata Kuliah**: Praktikum Kecerdasan Buatan
 - **Topik**: Prediksi Tingkat Kemiskinan di Indonesia
