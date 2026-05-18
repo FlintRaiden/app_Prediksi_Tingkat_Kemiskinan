@@ -1,4 +1,4 @@
-# ── Hugging Face Spaces — Docker SDK ────────────────────────────────────────
+# ── Railway Deployment ───────────────────────────────────────────────────────
 # Python 3.11 slim base
 FROM python:3.11-slim
 
@@ -19,19 +19,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy entire project
 COPY . .
 
-# Hugging Face Spaces runs as non-root user 1000
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /workspace
-USER 1000
-
-# Expose port expected by HF Spaces
-EXPOSE 7860
+# Expose port (Railway uses dynamic $PORT, default fallback 8000)
+EXPOSE 8000
 
 # Launch via Gunicorn — chdir into app/ so Flask finds templates & static
-CMD ["gunicorn", \
-     "--chdir", "app", \
-     "app:app", \
-     "--bind", "0.0.0.0:7860", \
-     "--workers", "1", \
-     "--timeout", "300", \
-     "--log-level", "info", \
-     "--access-logfile", "-"]
+CMD ["sh", "-c", "gunicorn --chdir app app:app --bind 0.0.0.0:${PORT:-8000} --workers 1 --timeout 300 --log-level info --access-logfile -"]
